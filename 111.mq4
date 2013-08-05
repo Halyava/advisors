@@ -43,10 +43,13 @@ int start()
    {
       double bb = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_MAIN, 0);
       double prevbb = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_MAIN, 1);
-      double prevbbhigh = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_UPPER, 1);
-      double prevbblow = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_LOWER, 1);
+      double bbhigh1 = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_UPPER, 1);
+      double bblow1 = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_LOWER, 1);
+      double bbhigh2 = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_UPPER, 2);
+      double bblow2 = iBands(NULL, 0, 20, 2, 0, PRICE_CLOSE, MODE_LOWER, 2);
       double ma21 = iMA(NULL, 0, 21, 0, MODE_EMA, PRICE_CLOSE, 0);
       double prevClose = iClose(NULL, 0, 1);
+      double profit = 0;
 
       for(i=0; i<total; i++)
       {
@@ -73,7 +76,12 @@ int start()
                openPos = false;
             }
          }
-         if (openPos) OrderSend(Symbol(),OP_SELL,LotSize,Bid,3,prevbbhigh,0,"",0,0, Red);
+         if (MathAbs(bbhigh1 - bbhigh2) <= 0.01)
+         {
+            profit = bblow1;
+         }
+
+         if (openPos) OrderSend(Symbol(),OP_SELL,LotSize,Bid,3,bbhigh1,0,"",0,0, Red);
       }
 
       if ((ma21 - bb) > delta)
@@ -86,7 +94,12 @@ int start()
                openPos = false;
             }
          }
-         if (openPos) OrderSend(Symbol(),OP_BUY,LotSize,Ask,3,prevbblow,0,"",0,0, Green);
+         if (MathAbs(bblow1 - bblow2) <= 0.01)
+         {
+            profit = bbhigh1;
+         }
+         
+         if (openPos) OrderSend(Symbol(),OP_BUY,LotSize,Ask,3,bblow1,profit,"",0,0, Green);
       }
    }
    LastBarTime = iTime(NULL, 0, 0);
@@ -100,30 +113,30 @@ Ticks modelled	1111842
 Modelling quality	n/a
 Mismatched charts errors	115
 Initial deposit	10000.00
-Total net profit	24867.02
-Gross profit	48888.04
-Gross loss	-24021.02
-Profit factor	2.04
-Expected payoff	173.90
+Total net profit	26645.12
+Gross profit	50934.73
+Gross loss	-24289.61
+Profit factor	2.10
+Expected payoff	176.46
 Absolute drawdown	276.02
-Maximal drawdown	4978.41 (17.47%)
-Relative drawdown	17.47% (4978.41)
-Total trades	143
+Maximal drawdown	4888.98 (17.28%)
+Relative drawdown	17.28% (4888.98)
+Total trades	151
 Short positions (won %)	74 (63.51%)
-Long positions (won %)	69 (73.91%)
-Profit trades (% of total)	98 (68.53%)
-Loss trades (% of total)	45 (31.47%)
+Long positions (won %)	77 (75.32%)
+Profit trades (% of total)	105 (69.54%)
+Loss trades (% of total)	46 (30.46%)
 	Largest
 profit trade	2514.94
 loss trade	-1518.05
 	Average
-profit trade	498.86
-loss trade	-533.80
+profit trade	485.09
+loss trade	-528.03
 	Maximum
-consecutive wins (profit in money)	11 (4337.72)
+consecutive wins (profit in money)	12 (4107.51)
 consecutive losses (loss in money)	4 (-1850.41)
 	Maximal
-consecutive profit (count of wins)	5309.67 (3)
+consecutive profit (count of wins)	5616.17 (5)
 consecutive loss (count of losses)	-1912.90 (2)
 	Average
 consecutive wins	3
