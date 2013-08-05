@@ -93,3 +93,40 @@ int start()
    return(0);
 }
 //+------------------------------------------------------------------+
+
+/*
+Bars in test	3932
+Ticks modelled	1111842
+Modelling quality	n/a
+Mismatched charts errors	115
+Initial deposit	10000.00
+Total net profit	24867.02
+Gross profit	48888.04
+Gross loss	-24021.02
+Profit factor	2.04
+Expected payoff	173.90
+Absolute drawdown	276.02
+Maximal drawdown	4978.41 (17.47%)
+Relative drawdown	17.47% (4978.41)
+Total trades	143
+Short positions (won %)	74 (63.51%)
+Long positions (won %)	69 (73.91%)
+Profit trades (% of total)	98 (68.53%)
+Loss trades (% of total)	45 (31.47%)
+	Largest
+profit trade	2514.94
+loss trade	-1518.05
+	Average
+profit trade	498.86
+loss trade	-533.80
+	Maximum
+consecutive wins (profit in money)	11 (4337.72)
+consecutive losses (loss in money)	4 (-1850.41)
+	Maximal
+consecutive profit (count of wins)	5309.67 (3)
+consecutive loss (count of losses)	-1912.90 (2)
+	Average
+consecutive wins	3
+consecutive losses	1
+
+*/
