@@ -6,8 +6,12 @@
 #property copyright "DH"
 #property link      ""
 
-extern double delta = 0.05;
-extern double LotSize = 0.01;
+extern double delta = 0.07;
+extern double LotSize = 0.5;
+extern double StopLoss = 0.20;
+extern double TakeProfit = 0.20;
+
+string key = "111";
 
 datetime LastBarTime = 0;
 //+------------------------------------------------------------------+
@@ -51,21 +55,75 @@ int start()
       double prevClose = iClose(NULL, 0, 1);
       double profit = 0;
 
-      for(i=0; i<total; i++)
+      Print("bb = " + bb + "; ma21 = " + ma21 + "; delta = " + (bb - ma21) + "; openPos = " + openPos);
+
+      if (MathAbs(bb - ma21) > delta)
       {
-         OrderSelect(i, SELECT_BY_POS);
-         if(OrderType() == OP_BUY && OrderOpenPrice() < prevbb)
+         if (bb > ma21)
          {
-            OrderModify(OrderTicket(),OrderOpenPrice(),prevbb,OrderTakeProfit(),0,Yellow);
+            for(i=0; i<total; i++)
+            {     
+               OrderSelect(i, SELECT_BY_POS);
+               if (OrderSymbol() == Symbol() && OrderComment() == key)
+               {
+                  if (OrderType() == OP_BUY)
+                  {
+                     OrderClose(OrderTicket(), OrderLots(), Bid, 3, Blue);                 
+                  }
+                  else
+                  {
+                     openPos = false;
+                  }
+               }
+            }
+
+            Print("SELL: bb = " + bb + "; ma21 = " + ma21 + "; delta = " + (bb - ma21) + "; openPos = " + openPos);
+            if (openPos)
+            {
+               if (OrderSend(Symbol(),OP_SELL,LotSize,Bid,3,0,0,key,0,0, Red) != -1)
+               {
+                  if (MathAbs(iClose(NULL, 0, 1) - iOpen(NULL, 0, 0)) < 0.20 && MathAbs(bbhigh1 - bbhigh2) > 0.02)
+                  {
+                     LotSize = MathMax(0.5, (AccountBalance() - (MathFloor(AccountBalance() / 400) * 100)) / 100) * 0.02;
+                     OrderSend(Symbol(),OP_BUY,LotSize,Ask,3,Bid - StopLoss, MathMax(bb, Ask + TakeProfit),NULL,0,0, Green);
+                  }
+               }
+            }
          }
-         else if(OrderType() == OP_SELL && OrderOpenPrice() > prevbb)
+         else
          {
-            OrderModify(OrderTicket(),OrderOpenPrice(),prevbb,OrderTakeProfit(),0,Yellow);
+            for(i=0; i<total; i++)
+            {     
+               OrderSelect(i, SELECT_BY_POS);
+               if (OrderSymbol() == Symbol() && OrderComment() == key)
+               {
+                  if (OrderType() == OP_SELL)
+                  {
+                     OrderClose(OrderTicket(), OrderLots(), Ask, 3, Blue);                 
+                  }
+                  else
+                  {
+                     openPos = false;
+                  }
+               }
+            }
+
+            Print("BUY: bb = " + bb + "; ma21 = " + ma21 + "; delta = " + (bb - ma21) + "; openPos = " + openPos);
+            if (openPos)
+            {
+               if (OrderSend(Symbol(),OP_BUY,LotSize,Ask,3,0,0,key,0,0, Green) != -1)
+               {
+                  if (MathAbs(iClose(NULL, 0, 1) - iOpen(NULL, 0, 0)) < 0.20 && MathAbs(bblow1 - bblow2) > 0.02)
+                  {
+                     LotSize = MathMax(0.5, (AccountBalance() - (MathFloor(AccountBalance() / 400) * 100)) / 100) * 0.02;
+                     OrderSend(Symbol(),OP_SELL,LotSize,Bid,3,Ask + StopLoss,MathMin(bb, Bid - TakeProfit),NULL,0,0, Green);
+                  }
+               }
+            }
          }
       }
 
-//      Print("bb = " + bb + "; ma21 = " + ma21 + "; bb - ma21 = " + (bb - ma21));
-
+/*
       if ((bb - ma21) > delta)
       {
          for(i=0; i<total; i++)
@@ -101,6 +159,7 @@ int start()
          
          if (openPos) OrderSend(Symbol(),OP_BUY,LotSize,Ask,3,bblow1,profit,"",0,0, Green);
       }
+*/
    }
    LastBarTime = iTime(NULL, 0, 0);
    return(0);
@@ -108,38 +167,38 @@ int start()
 //+------------------------------------------------------------------+
 
 /*
-Bars in test	3932
-Ticks modelled	1111842
+Bars in test	7914
+Ticks modelled	1839315
 Modelling quality	n/a
-Mismatched charts errors	115
-Initial deposit	10000.00
-Total net profit	26645.12
-Gross profit	50934.73
-Gross loss	-24289.61
-Profit factor	2.10
-Expected payoff	176.46
-Absolute drawdown	276.02
-Maximal drawdown	4888.98 (17.28%)
-Relative drawdown	17.28% (4888.98)
-Total trades	151
-Short positions (won %)	74 (63.51%)
-Long positions (won %)	77 (75.32%)
-Profit trades (% of total)	105 (69.54%)
-Loss trades (% of total)	46 (30.46%)
+Mismatched charts errors	698
+Initial deposit	20.00
+Total net profit	1014.90
+Gross profit	4145.86
+Gross loss	-3130.96
+Profit factor	1.32
+Expected payoff	3.77
+Absolute drawdown	9.38
+Maximal drawdown	406.72 (46.01%)
+Relative drawdown	72.56% (150.20)
+Total trades	269
+Short positions (won %)	135 (47.41%)
+Long positions (won %)	134 (55.22%)
+Profit trades (% of total)	138 (51.30%)
+Loss trades (% of total)	131 (48.70%)
 	Largest
-profit trade	2514.94
-loss trade	-1518.05
+profit trade	158.04
+loss trade	-151.59
 	Average
-profit trade	485.09
-loss trade	-528.03
+profit trade	30.04
+loss trade	-23.90
 	Maximum
-consecutive wins (profit in money)	12 (4107.51)
-consecutive losses (loss in money)	4 (-1850.41)
+consecutive wins (profit in money)	8 (332.04)
+consecutive losses (loss in money)	7 (-56.58)
 	Maximal
-consecutive profit (count of wins)	5616.17 (5)
-consecutive loss (count of losses)	-1912.90 (2)
+consecutive profit (count of wins)	384.57 (4)
+consecutive loss (count of losses)	-212.36 (2)
 	Average
-consecutive wins	3
-consecutive losses	1
+consecutive wins	2
+consecutive losses	2
 
 */
